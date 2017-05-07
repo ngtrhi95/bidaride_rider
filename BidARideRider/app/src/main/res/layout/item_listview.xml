@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:ripple="http://schemas.android.com/apk/res-auto"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/card_background_white"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:padding="16.0dip">
+
+    <ImageView
+        android:id="@+id/app_icon"
+        android:layout_width="80dp"
+        android:layout_height="50dp"
+        android:layout_marginEnd="8.0dip"
+        android:layout_marginRight="8.0dip"
+        android:contentDescription="@null"
+        android:src="@drawable/drivericon"/>
+
+    <LinearLayout
+        android:layout_width="0.0dip"
+        android:layout_height="wrap_content"
+        android:layout_weight="1.0"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/drivername"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:ellipsize="marquee"
+            android:textAlignment="viewStart"
+            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+            android:text="Driver Name"/>
+
+        <RelativeLayout
+            android:layout_width="75dp"
+            android:layout_height="26dp"
+            android:layout_gravity="left">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/phoneicon"
+                android:layout_alignParentBottom="true"
+                android:layout_toStartOf="@+id/driverphone"
+                android:layout_toLeftOf="@+id/driverphone" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="Small Text"
+                android:id="@+id/driverphone"
+                android:textSize="12dp"
+                android:layout_marginLeft="5dp"
+                android:layout_gravity="right"
+                android:layout_centerVertical="true"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true" />
+        </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="75dp"
+            android:layout_height="26dp"
+            android:layout_gravity="right">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/wayicon"
+                android:layout_alignParentBottom="true"
+                android:layout_toStartOf="@+id/distance"
+                android:layout_toLeftOf="@+id/distance" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="Small Text"
+                android:id="@+id/distance"
+                android:textSize="12dp"
+                android:layout_marginLeft="5dp"
+                android:textColor="#EE0000"
+                android:layout_gravity="right"
+                android:layout_centerVertical="true"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true" />
+        </RelativeLayout>
+    </LinearLayout>
+
+
+</LinearLayout>

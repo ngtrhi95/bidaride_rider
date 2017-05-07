@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.trhie.bidariderider.MainActivity">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/background">
+        <TextView
+            android:id="@+id/imac"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:text="BID A RIDE"
+            android:textSize="28dp"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="43dp" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:text="for Rider"
+            android:textSize="20dp"
+            android:textColor="#FFFFFF"
+            android:layout_below="@+id/imac"
+            android:layout_marginTop="15dp"
+            android:layout_centerHorizontal="true"
+            android:id="@+id/textView" />
+        <TextView
+            android:id="@+id/sin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Sign In"
+            android:textSize="25dp"
+            android:textColor="#54abee"
+            android:gravity="center"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="45dp"
+            android:onClick="signin_page"
+            />
+
+        <TextView
+            android:id="@+id/account"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Already have an account?"
+            android:textSize="16dp"
+            android:textColor="#c4c5c9"
+            android:gravity="center"
+            android:layout_above="@id/sin"
+            android:paddingBottom="16dp"
+            />
+        <LinearLayout
+            android:id="@+id/circle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/circleangle"
+            android:padding="16dp"
+            android:orientation="horizontal"
+            android:layout_marginTop="73dp"
+            android:layout_below="@+id/textView"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:onClick="signup_page">
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginLeft="1dp">
+                <ImageView
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:src="@drawable/angle2"
+                    />
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@drawable/bag"
+                    android:paddingLeft="3dp"
+                    android:layout_gravity="center"
+                    />
+            </FrameLayout>
+            <TextView
+                android:id="@+id/signupforfree"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Sign Up For Free"
+                android:textSize="22dp"
+                android:textColor="#fff"
+                android:layout_gravity="center"
+                android:layout_marginLeft="16dp"/>
+        </LinearLayout>
+    </RelativeLayout>
+
+</FrameLayout>

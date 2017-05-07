@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.trhie.bidariderider">
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyAI08REC0HXkj47b2pZq-7IsHKLkPI1Z4U" />
+
+        <activity android:name=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".SigninActivity"
+            android:label="Sign in"
+            android:parentActivityName=".MainActivity">
+        </activity>
+        <activity
+            android:name=".SignupActivity"
+            android:label="Sign up"
+            android:parentActivityName=".MainActivity">
+        </activity>
+        <activity
+            android:name=".DirectionActivity"
+            android:label="Direction">
+        </activity>
+        <activity android:name=".MapsActivity"
+            android:parentActivityName=".DirectionActivity"
+            android:label="Map">
+        </activity>
+        <activity android:name=".MapdirectionActivity"
+            android:parentActivityName=".DirectionActivity"
+            android:label="Map">
+        </activity>
+        <activity android:name=".ListDriver"
+            android:parentActivityName=".DirectionActivity"
+            android:label="Listing driver">
+        </activity>
+    </application>
+
+</manifest>
