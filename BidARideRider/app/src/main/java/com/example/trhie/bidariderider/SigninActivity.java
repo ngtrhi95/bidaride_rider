@@ -44,21 +44,17 @@ import static android.R.attr.button;
 public class SigninActivity extends AppCompatActivity {
     EditText etUsername, etPassword;
     String username, password;
-    JSONObject userObject;
     int status;
-
+    UserSession session;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signin);
 
+        session = new UserSession(getApplicationContext());
+
         etUsername = (EditText)findViewById(R.id.usrusr);
         etPassword = (EditText) findViewById(R.id.pswrd);
-    }
-
-    public void back(View view) {
-        Intent it = new Intent(this, MainActivity.class);
-        startActivity(it);
     }
 
     public void signin(View view) {
@@ -81,7 +77,7 @@ public class SigninActivity extends AppCompatActivity {
         }
         else {
             Networking n = new Networking();
-            n.execute("https://fast-hollows-58498.herokuapp.com/user/login", Networking.NETWORK_STATE_SIGNIN);
+            n.execute("https://appluanvan-apigateway.herokuapp.com/user/login", Networking.NETWORK_STATE_SIGNIN);
 
         }
     }
@@ -89,7 +85,7 @@ public class SigninActivity extends AppCompatActivity {
     public  class Networking extends AsyncTask {
         public static final int NETWORK_STATE_SIGNIN = 1;
         private SpotsDialog progressDialog = new SpotsDialog(SigninActivity.this, R.style.Custom);
-
+        JSONObject response;
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -98,7 +94,11 @@ public class SigninActivity extends AppCompatActivity {
 
         @Override
         protected Object doInBackground(Object[] params) {
-            getJson((String) params[0], (Integer) params[1]);
+            try {
+                response = getJson((String) params[0], (Integer) params[1]);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
             return  null;
         }
 
@@ -107,18 +107,42 @@ public class SigninActivity extends AppCompatActivity {
             super.onPostExecute(o);
             progressDialog.dismiss();
 
+            try {
+                status = response.getInt("status");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
             if (status != 200) {
                 Toast.makeText(SigninActivity.this, "Username or Password is incorrect!", Toast.LENGTH_SHORT).show();
             }
             else {
+                JSONObject payload = null;
+                String uID = "";
+                String uPhone = "";
+                String uEmail = "";
+                String uFname = "";
+                try {
+                    payload = response.getJSONObject("payload");
+                    uID = payload.getString("userID");
+                    uPhone = payload.getString("phone");
+                    uEmail = payload.getString("email");
+                    uFname = payload.getString("userFullname");
+                } catch (JSONException err) {
+                    Log.e("MYAPP", "JSON exception error", err);
+                }
+
+
+                session.createUserLoginSession(username, uID, uPhone, uEmail, uFname,
+                        password);
+
                 Intent it = new Intent(SigninActivity.this, DirectionActivity.class);
-                it.putExtra("userObject", userObject.toString());
                 startActivity(it);
             }
         }
     }
 
-    private void getJson(String url, int state) {
+    private JSONObject getJson(String url, int state) throws JSONException {
         HttpClient httpClient = new DefaultHttpClient();
         HttpPost request = new HttpPost(url);
         List<NameValuePair> postParameters = new ArrayList<NameValuePair>();
@@ -131,16 +155,16 @@ public class SigninActivity extends AppCompatActivity {
                 valid = true;
                 break;
         }
-
+        StringBuffer stringBuffer = new StringBuffer("");
         if (valid) {
             BufferedReader bufferedReader = null;
-            StringBuffer stringBuffer = new StringBuffer("");
+
             try {
                 UrlEncodedFormEntity entity = new UrlEncodedFormEntity(postParameters);
                 request.setEntity(entity);
-                HttpResponse response = httpClient.execute(request);
+                HttpResponse response_http = httpClient.execute(request);
 
-                bufferedReader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+                bufferedReader = new BufferedReader(new InputStreamReader(response_http.getEntity().getContent()));
 
                 String line = "";
                 String LineSeparator = System.getProperty("line.separator");
@@ -157,17 +181,8 @@ public class SigninActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
 
-            decodeResultIntoJson(stringBuffer.toString());
         }
-    }
-
-    private void decodeResultIntoJson(String response) {
-        try {
-            JSONObject jo = new JSONObject(response);
-            userObject = jo.getJSONObject("payload");
-            status = jo.getInt("status");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        JSONObject jo = new JSONObject(stringBuffer.toString());
+        return jo;
     }
 }

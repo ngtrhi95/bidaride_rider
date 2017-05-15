@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical" android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:textColor="#1A237E"
+            android:textSize="18dp"
+            android:textStyle="bold"
+            android:text="Đã có BID A RIDE, đi lại chỉ là chuyện nhỏ."/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="30dp">
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:textSize="16dp"
+            android:textColor="#000"
+            android:text="Từ ngày có BID A RIDE, Rider không còn nỗi lo dắt xe nặng nề, gửi xe mệt mỏi, rồi phải tự chen chúc giữa dòng người đông đúc nữa."/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:textSize="16dp"
+            android:textColor="#000"
+            android:text="Và để vui càng thêm vui, BID A RIDE sẽ mang đến cho bạn một ưu đãi thú vị để ngày Thứ Tư luôn là ngày vui vẻ nhất"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="30dp">
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:textColor="#1A237E"
+            android:textSize="18dp"
+            android:textStyle="bold"
+            android:text="Theo đó mỗi thứ tư hàng tuần, BID A RIDE dành tặng cho bạn 4 chuyến đi MIỄN PHÍ khi nhập mã VUI."/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="30dp">
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:textSize="16dp"
+            android:textColor="#000"
+            android:text="Theo đó:"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:textSize="16dp"
+            android:textColor="#000"
+            android:text="- Bạn nhập mã VUI khi đặt BID D RIDE trong ngày thứ tư."/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:textSize="16dp"
+            android:textColor="#000"
+            android:text="- Mã VUI miễn phí 30.000đ x 4 chuyến BID A RIDE."/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:textSize="16dp"
+            android:textColor="#000"
+            android:text="- Chương trình dành cho tất cả khách hàng thanh toán BID A RIDE bằng RIDEPAY và Credit Card."/>
+
+    </LinearLayout>
+</ScrollView>

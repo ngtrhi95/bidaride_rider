@@ -36,6 +36,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import Modules.BookingInfo;
 import Modules.DriverAdapter;
 import Modules.NetworkingCreateTrip;
 import Modules.DirectionInfo;
@@ -66,7 +67,7 @@ public class ListDriver extends AppCompatActivity{
         listItems = (ListView) findViewById(R.id.listView);
 
         NetworkingAPI n = new NetworkingAPI();
-        n.execute("https://fast-hollows-58498.herokuapp.com/driver/coordInfo");
+        n.execute("https://appluanvan-apigateway.herokuapp.com/driver/coordInfo");
     }
 
     class Driver {
@@ -217,8 +218,19 @@ public class ListDriver extends AppCompatActivity{
                                         TripInfo tripInfo = createTripInfo(temp);
 
                                         NetworkingCreateTrip networking = new NetworkingCreateTrip();
-                                        networking.execute("https://fast-hollows-58498.herokuapp.com/trip/create", tripInfo);
+                                        networking.execute("https://appluanvan-apigateway.herokuapp.com/trip/create", tripInfo);
+
                                         Toast.makeText(ListDriver.this, "Booking success. Driver will contact you in a few minutes.", Toast.LENGTH_SHORT).show();
+
+                                        BookingInfo bookingInfo = new BookingInfo();
+                                        bookingInfo.setDriverName(temp.driverFullname);
+                                        bookingInfo.setFromAddress(directionInfo.getOriginInfo().getAddress());
+                                        bookingInfo.setDriverPhone(temp.driverPhone);
+                                        bookingInfo.setToAddress(directionInfo.getDesAddress());
+                                        bookingInfo.setCost(directionInfo.getCost());
+                                        Intent it = new Intent(ListDriver.this, StatusActivity.class);
+                                        it.putExtra("bookingInfo", bookingInfo);
+                                        startActivity(it);
                                     }
                                 });
 

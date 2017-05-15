@@ -14,6 +14,7 @@ public class DirectionInfo implements Parcelable {
     private String userID;
     private String DesAddress;
     private LatLng DesLocation;
+    private String cost;
 
 
 
@@ -21,25 +22,12 @@ public class DirectionInfo implements Parcelable {
 
     }
 
-
     protected DirectionInfo(Parcel in) {
         originInfo = in.readParcelable(PlaceInfo.class.getClassLoader());
         userID = in.readString();
         DesAddress = in.readString();
         DesLocation = in.readParcelable(LatLng.class.getClassLoader());
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeParcelable(originInfo, flags);
-        dest.writeString(userID);
-        dest.writeString(DesAddress);
-        dest.writeParcelable(DesLocation, flags);
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
+        cost = in.readString();
     }
 
     public static final Creator<DirectionInfo> CREATOR = new Creator<DirectionInfo>() {
@@ -84,5 +72,27 @@ public class DirectionInfo implements Parcelable {
 
     public void setDesLocation(LatLng desLocation) {
         DesLocation = desLocation;
+    }
+
+    public String getCost() {
+        return cost;
+    }
+
+    public void setCost(String cost) {
+        this.cost = cost;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeParcelable(originInfo, flags);
+        dest.writeString(userID);
+        dest.writeString(DesAddress);
+        dest.writeParcelable(DesLocation, flags);
+        dest.writeString(cost);
     }
 }

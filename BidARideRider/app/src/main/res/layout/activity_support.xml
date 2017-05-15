@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#fff">
+    <RelativeLayout
+        android:id="@+id/relativeLayout1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#fff"
+        android:layout_marginTop="7dp"
+        android:layout_marginLeft="7dp"
+        android:layout_marginRight="7dp"
+        android:layout_marginBottom="7dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <EditText
+                android:layout_marginBottom="130dp"
+                android:padding="7dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:hint="Để lại phản hồi"
+                android:background="@drawable/border"
+                android:gravity="top|left"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="0dp"
+            android:layout_alignParentBottom="true"
+            android:orientation="vertical">
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#9E9E9E"
+                android:text="GỬI"
+                android:textStyle="bold"
+                android:textSize="13dp"
+                android:onClick="sendFeedBack"
+                android:textColor="#fff" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:textAlignment="center"
+                android:text="HOẶC"
+                android:textColor="#000"/>
+            <Button
+                android:id="@+id/btnCall"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#54abee"
+                android:text="GỌI TỔNG ĐÀI"
+                android:textStyle="bold"
+                android:textSize="12dp"
+                android:onClick="callPhone"
+                android:textColor="#fff" />
+        </LinearLayout>
+    </RelativeLayout>
+</LinearLayout>

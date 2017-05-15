@@ -1,15 +1,31 @@
 package com.example.trhie.bidariderider;
 
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.facebook.share.model.SharePhoto;
+import com.facebook.share.model.SharePhotoContent;
+import com.facebook.share.widget.ShareButton;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -24,33 +40,59 @@ import Modules.DirectionInfo;
 import Modules.PlaceInfo;
 import Modules.Route;
 
+import static com.example.trhie.bidariderider.UserSession.KEY_FNAME;
+import static com.example.trhie.bidariderider.UserSession.KEY_ID;
+import static com.example.trhie.bidariderider.UserSession.KEY_PHONE;
+import static com.example.trhie.bidariderider.UserSession.PREFER_NAME;
+
 /**
  * Created by trhie on 4/30/2017.
  */
 
-public class DirectionActivity extends AppCompatActivity implements DirectionFinderListener {
+public class DirectionActivity extends AppCompatActivity implements DirectionFinderListener, NavigationView.OnNavigationItemSelectedListener {
+    public static android.content.SharedPreferences SharedPreferences = null;
     EditText etSrcAddress, etDesAddress;
+    TextView tvFullname, tvPhone;
     static PlaceInfo originPlace = new PlaceInfo();
     static PlaceInfo desPlace = new PlaceInfo();
     DirectionInfo directionInfo = new DirectionInfo();
-    static JSONObject userObject;
     ProgressDialog progressDialog;
+    UserSession session;
+    String costStr;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_direction);
 
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        //setSupportActionBar(toolbar);
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        tvFullname = (TextView) navigationView.getHeaderView(0).findViewById(R.id.userfullname);
+        tvPhone = (TextView) navigationView.getHeaderView(0).findViewById(R.id.userphone);
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+
+        navigationView.setNavigationItemSelectedListener(this);
+
         etSrcAddress = (EditText)findViewById(R.id.srcpst);
         etDesAddress = (EditText)findViewById(R.id.despst);
 
-        if (userObject == null) {
-            try {
-                userObject = new JSONObject(getIntent().getStringExtra("userObject"));
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
+        session = new UserSession(getApplicationContext());
+
+        SharedPreferences = getSharedPreferences(PREFER_NAME, Context.MODE_PRIVATE);
+
+
+        session.checkLogin();
+
+        String userID = SharedPreferences.getString(KEY_ID, "");
+        String s = SharedPreferences.getString(KEY_FNAME, "");
+        tvFullname.setText(SharedPreferences.getString(KEY_FNAME, ""));
+        tvPhone.setText(SharedPreferences.getString(KEY_PHONE, ""));
 
         Intent i = getIntent();
         PlaceInfo lastLocation = (PlaceInfo) i.getParcelableExtra("lastLocation");
@@ -80,6 +122,39 @@ public class DirectionActivity extends AppCompatActivity implements DirectionFin
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+
     public void showSrcMap(View view) {
         Intent it = new Intent(this, MapsActivity.class);
         it.putExtra("SrcMap", 1);
@@ -107,7 +182,8 @@ public class DirectionActivity extends AppCompatActivity implements DirectionFin
             ((TextView) findViewById(R.id.tvDirection)).setText("Distance: " + route.distance.text);
             int distance = route.distance.value;
             int cost = distance * 3;
-            ((TextView) findViewById(R.id.tvCost)).setText("Cost: " + Integer.toString(cost) + " VNĐ");
+            costStr = Integer.toString(cost) + " VNĐ";
+            ((TextView) findViewById(R.id.tvCost)).setText("Cost: " + costStr);
         }
 
     }
@@ -129,17 +205,38 @@ public class DirectionActivity extends AppCompatActivity implements DirectionFin
         }
         Intent i = new Intent(DirectionActivity.this, ListDriver.class);
         String id = null;
-        try {
-            id = userObject.get("userID").toString();
-            directionInfo.setUserID(id);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+
+        id = SharedPreferences.getString(KEY_ID, "");
+        directionInfo.setUserID(id);
 
         directionInfo.setOriginInfo(originPlace);
         directionInfo.setDesAddress(desPlace.getAddress());
         directionInfo.setDesLocation(desPlace.getLocation());
+        directionInfo.setCost(costStr);
         i.putExtra("originPlace", directionInfo);
         startActivity(i);
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+// Handle navigation view item clicks here.
+        int id = item.getItemId();
+
+        if (id == R.id.nav_logout) {
+            session.logoutUser();
+            startActivity(new Intent(DirectionActivity.this, MainActivity.class));
+        } else if (id == R.id.nav_aboutus) {
+            startActivity(new Intent(DirectionActivity.this, AboutusActivity.class));
+        } else if (id == R.id.nav_promotion){
+            startActivity(new Intent(DirectionActivity.this, PromotionActivity.class));
+        } else if (id == R.id.nav_share) {
+            startActivity(new Intent(DirectionActivity.this, ShareActivity.class));
+        } else if (id == R.id.nav_support) {
+            startActivity(new Intent(DirectionActivity.this, SupportActivity.class));
+        }
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+
     }
 }

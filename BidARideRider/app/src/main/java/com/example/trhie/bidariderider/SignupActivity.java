@@ -82,7 +82,7 @@ public class SignupActivity extends AppCompatActivity {
         }
         else {
             Networking n = new Networking();
-            n.execute("https://fast-hollows-58498.herokuapp.com/user/register", Networking.NETWORK_STATE_SIGNUP);
+            n.execute("https://appluanvan-apigateway.herokuapp.com/user/register", Networking.NETWORK_STATE_SIGNUP);
         }
     }
 

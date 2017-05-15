@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_history"
+            android:title="Driver history list"
+            android:icon="@drawable/listicon"/>
+        <item
+            android:id="@+id/nav_promotion"
+            android:title="Promotion"
+            android:icon="@drawable/promotionicon"/>
+        <item
+            android:id="@+id/nav_support"
+            android:title="Support"
+            android:icon="@drawable/feedback"/>
+        <item
+            android:id="@+id/nav_share"
+            android:title="Share facebook"
+            android:icon="@drawable/facebook"/>
+        <item
+            android:id="@+id/nav_logout"
+            android:title="Log out"
+            android:icon="@drawable/logouticon"/>
+
+        <item
+            android:id="@+id/nav_aboutus"
+            android:title="About us"
+            android:icon="@drawable/aboutus"/>
+
+    </group>
+
+</menu>

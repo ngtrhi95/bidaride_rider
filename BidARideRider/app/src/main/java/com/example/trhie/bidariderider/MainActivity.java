@@ -22,4 +22,14 @@ public class MainActivity extends AppCompatActivity {
         Intent it = new Intent(this,SignupActivity.class);
         startActivity(it);
     }
+
+    @Override
+    public void onBackPressed() {
+        //this.finish();
+        Intent intent= new Intent(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_HOME);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+        finish();
+    }
 }
