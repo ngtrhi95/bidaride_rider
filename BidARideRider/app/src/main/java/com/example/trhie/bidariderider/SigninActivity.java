@@ -77,7 +77,7 @@ public class SigninActivity extends AppCompatActivity {
         }
         else {
             Networking n = new Networking();
-            n.execute("https://appluanvan-apigateway.herokuapp.com/user/login", Networking.NETWORK_STATE_SIGNIN);
+            n.execute("https://appluanvan-apigateway.herokuapp.com/api/user/login", Networking.NETWORK_STATE_SIGNIN);
 
         }
     }
@@ -122,19 +122,21 @@ public class SigninActivity extends AppCompatActivity {
                 String uPhone = "";
                 String uEmail = "";
                 String uFname = "";
+                String uToken = "";
                 try {
                     payload = response.getJSONObject("payload");
                     uID = payload.getString("userID");
                     uPhone = payload.getString("phone");
                     uEmail = payload.getString("email");
                     uFname = payload.getString("userFullname");
+                    uToken = response.getString("token");
                 } catch (JSONException err) {
                     Log.e("MYAPP", "JSON exception error", err);
                 }
 
 
                 session.createUserLoginSession(username, uID, uPhone, uEmail, uFname,
-                        password);
+                        password, uToken);
 
                 Intent it = new Intent(SigninActivity.this, DirectionActivity.class);
                 startActivity(it);

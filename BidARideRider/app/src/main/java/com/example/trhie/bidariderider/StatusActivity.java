@@ -1,5 +1,6 @@
 package com.example.trhie.bidariderider;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -13,15 +14,20 @@ import java.util.Date;
 import Modules.BookingInfo;
 import Modules.DirectionInfo;
 
+import static com.example.trhie.bidariderider.UserSession.KEY_ID;
+import static com.example.trhie.bidariderider.UserSession.PREFER_NAME;
+
 /**
  * Created by trhie on 5/13/2017.
  */
 
 public class StatusActivity extends AppCompatActivity {
     BookingInfo bookingInfo;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         String now = DateFormat.getDateTimeInstance().format(new Date());
         setTitle(now);
         setContentView(R.layout.activity_status);

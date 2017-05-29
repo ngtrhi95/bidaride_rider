@@ -1,6 +1,7 @@
 package com.example.trhie.bidariderider;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
@@ -42,11 +43,16 @@ import Modules.NetworkingCreateTrip;
 import Modules.DirectionInfo;
 import Modules.TripInfo;
 
+import static com.example.trhie.bidariderider.UserSession.KEY_TOKEN;
+import static com.example.trhie.bidariderider.UserSession.PREFER_NAME;
+
 /**
  * Created by trhie on 5/1/2017.
  */
 
 public class ListDriver extends AppCompatActivity{
+    public static android.content.SharedPreferences SharedPreferences = null;
+
     ListView listItems;
     static DirectionInfo directionInfo;
     JSONArray driverObject;
@@ -60,6 +66,8 @@ public class ListDriver extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.list_driver);
 
+        SharedPreferences = getSharedPreferences(PREFER_NAME, Context.MODE_PRIVATE);
+
         Intent i = getIntent();
         directionInfo = (DirectionInfo) i.getParcelableExtra("originPlace");
 
@@ -67,7 +75,7 @@ public class ListDriver extends AppCompatActivity{
         listItems = (ListView) findViewById(R.id.listView);
 
         NetworkingAPI n = new NetworkingAPI();
-        n.execute("https://appluanvan-apigateway.herokuapp.com/driver/coordInfo");
+        n.execute("https://appluanvan-apigateway.herokuapp.com/api/driver/coordInfo");
     }
 
     class Driver {
@@ -109,6 +117,8 @@ public class ListDriver extends AppCompatActivity{
 
                 URI website = new URI(url);
                 HttpGet request = new HttpGet();
+                String token = SharedPreferences.getString(KEY_TOKEN, "");
+                request.setHeader("x-access-token", token);
                 request.setURI(website);
                 HttpResponse response = client.execute(request);
                 response.getStatusLine().getStatusCode();
@@ -217,8 +227,8 @@ public class ListDriver extends AppCompatActivity{
                                     public void onClick(DialogInterface arg0, int arg1) {
                                         TripInfo tripInfo = createTripInfo(temp);
 
-                                        NetworkingCreateTrip networking = new NetworkingCreateTrip();
-                                        networking.execute("https://appluanvan-apigateway.herokuapp.com/trip/create", tripInfo);
+                                        NetworkingCreateTrip networking = new NetworkingCreateTrip(getApplicationContext());
+                                        networking.execute("https://appluanvan-apigateway.herokuapp.com/api/trip/create", tripInfo);
 
                                         Toast.makeText(ListDriver.this, "Booking success. Driver will contact you in a few minutes.", Toast.LENGTH_SHORT).show();
 
