@@ -39,7 +39,9 @@ import java.net.URISyntaxException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
 
@@ -232,14 +234,11 @@ public class ListDriver extends AppCompatActivity{
                                     @Override
                                     public void onClick(DialogInterface arg0, int arg1) {
                                         final Trip tripInfo = createTripInfo(driver);
-
-                                        String username = SharedPreferences.getString(KEY_FNAME, "");
-                                        String userphone = SharedPreferences.getString(KEY_PHONE, "");
                                         Gson gson = new Gson();
                                         String json = gson.toJson(tripInfo);
 
-                                        /*Toast.makeText(ListDriver.this, "Booking success. Driver will contact you in a few minutes.", Toast.LENGTH_SHORT).show();
-                                        ListDriver.this.runOnUiThread(new Runnable() {
+                                        Toast.makeText(ListDriver.this, "Booking success. Driver will contact you in a few minutes.", Toast.LENGTH_SHORT).show();
+                                        /*ListDriver.this.runOnUiThread(new Runnable() {
 
                                             @Override
                                             public void run() {
@@ -290,6 +289,9 @@ public class ListDriver extends AppCompatActivity{
         tripInfo.setPrice(directionInfo.getCost());
         tripInfo.setUsername(SharedPreferences.getString(KEY_FNAME, ""));
         tripInfo.setUserphone(SharedPreferences.getString(KEY_PHONE, ""));
+        SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
+        String formattedDate = df.format(Calendar.getInstance().getTime());
+        tripInfo.setCreatedDate(formattedDate);
         return tripInfo;
     }
 

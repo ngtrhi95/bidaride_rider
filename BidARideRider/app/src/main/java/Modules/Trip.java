@@ -13,7 +13,7 @@ public class Trip implements Parcelable {
     private String tripID;
     private String userID;
     private String username;
-    private String userphone;
+    private String userPhone;
     private String driverID;
     private String tripFrom;
     private String tripTo;
@@ -30,7 +30,7 @@ public class Trip implements Parcelable {
         tripID = in.readString();
         userID = in.readString();
         username = in.readString();
-        userphone = in.readString();
+        userPhone = in.readString();
         driverID = in.readString();
         tripFrom = in.readString();
         tripTo = in.readString();
@@ -53,7 +53,7 @@ public class Trip implements Parcelable {
         dest.writeString(tripID);
         dest.writeString(userID);
         dest.writeString(username);
-        dest.writeString(userphone);
+        dest.writeString(userPhone);
         dest.writeString(driverID);
         dest.writeString(tripFrom);
         dest.writeString(tripTo);
@@ -197,10 +197,10 @@ public class Trip implements Parcelable {
     }
 
     public String getUserphone() {
-        return userphone;
+        return userPhone;
     }
 
     public void setUserphone(String userphone) {
-        this.userphone = userphone;
+        this.userPhone = userphone;
     }
 }

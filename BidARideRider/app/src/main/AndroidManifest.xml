@@ -80,9 +80,6 @@
             android:label="Driver History List"
             android:parentActivityName=".DirectionActivity">
         </activity>
-        <activity android:name=".PopupActivity"
-            android:theme="@style/AppTheme.CustomTheme">
-        </activity>
 
 
         <activity android:name="com.facebook.FacebookActivity"

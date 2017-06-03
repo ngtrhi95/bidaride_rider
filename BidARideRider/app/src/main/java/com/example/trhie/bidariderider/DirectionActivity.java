@@ -73,39 +73,6 @@ public class DirectionActivity extends AppCompatActivity implements DirectionFin
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_direction);
 
-        NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(DirectionActivity.this)
-                        .setSmallIcon(R.drawable.logo)
-                        .setContentTitle("My notification")
-                        .setPriority(Notification.PRIORITY_HIGH)
-                        .setContentText("Hello World!");
-// Creates an explicit intent for an Activity in your app
-        Intent resultIntent = new Intent(DirectionActivity.this, LogsActivity.class);
-
-// The stack builder object will contain an artificial back stack for the
-// started Activity.
-// This ensures that navigating backward from the Activity leads out of
-// your application to the Home screen.
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(DirectionActivity.this);
-// Adds the back stack for the Intent (but not the Intent itself)
-        stackBuilder.addParentStack(LogsActivity.class);
-// Adds the Intent that starts the Activity to the top of the stack
-        stackBuilder.addNextIntent(resultIntent);
-        PendingIntent resultPendingIntent =
-                stackBuilder.getPendingIntent(
-                        0,
-                        PendingIntent.FLAG_UPDATE_CURRENT
-                );
-        Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        mBuilder.setSound(alarmSound);
-        mBuilder.setContentIntent(resultPendingIntent);
-        NotificationManager mNotificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-// mId allows you to update the notification later on.
-        mNotificationManager.notify(0, mBuilder.build());
-
-        startActivity(new Intent(DirectionActivity.this, PopupActivity.class));
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         //setSupportActionBar(toolbar);
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
