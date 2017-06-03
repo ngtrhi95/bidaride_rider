@@ -136,6 +136,7 @@ public class StatusActivity extends AppCompatActivity {
 
                     Gson g = new Gson();
                     Trip data = g.fromJson(message, Trip.class);
+
                     NotificationCompat.Builder mBuilder =
                             new NotificationCompat.Builder(StatusActivity.this)
                                     .setSmallIcon(R.drawable.logo)
