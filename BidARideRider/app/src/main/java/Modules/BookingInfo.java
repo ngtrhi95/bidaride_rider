@@ -12,7 +12,7 @@ public class BookingInfo implements Parcelable {
     private String driverPhone;
     private String fromAddress;
     private String toAddress;
-    private String cost;
+    private int cost;
 
     public BookingInfo() {
 
@@ -23,7 +23,7 @@ public class BookingInfo implements Parcelable {
         driverPhone = in.readString();
         fromAddress = in.readString();
         toAddress = in.readString();
-        cost = in.readString();
+        cost = in.readInt();
     }
 
     public static final Creator<BookingInfo> CREATOR = new Creator<BookingInfo>() {
@@ -70,11 +70,11 @@ public class BookingInfo implements Parcelable {
         this.toAddress = toAddress;
     }
 
-    public String getCost() {
+    public int getCost() {
         return cost;
     }
 
-    public void setCost(String cost) {
+    public void setCost(int cost) {
         this.cost = cost;
     }
 
@@ -89,6 +89,6 @@ public class BookingInfo implements Parcelable {
         dest.writeString(driverPhone);
         dest.writeString(fromAddress);
         dest.writeString(toAddress);
-        dest.writeString(cost);
+        dest.writeInt(cost);
     }
 }

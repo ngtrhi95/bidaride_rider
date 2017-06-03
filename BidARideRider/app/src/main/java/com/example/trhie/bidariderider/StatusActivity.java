@@ -43,10 +43,10 @@ public class StatusActivity extends AppCompatActivity {
         ((TextView)findViewById(R.id.tvStatusDriverPhone)).setText(bookingInfo.getDriverPhone());
         ((TextView)findViewById(R.id.tvfrom)).setText(bookingInfo.getFromAddress());
         ((TextView)findViewById(R.id.tvto)).setText(bookingInfo.getToAddress());
-        ((TextView)findViewById(R.id.tvStatusCost)).setText(bookingInfo.getCost());
+        ((TextView)findViewById(R.id.tvStatusCost)).setText(String.valueOf(bookingInfo.getCost()));
 
-        ReceiveDirectLog tripTask = new ReceiveDirectLog();
-        tripTask.execute(driverID);
+        /*ReceiveDirectLog tripTask = new ReceiveDirectLog();
+        tripTask.execute(driverID);*/
     }
 
     private class ReceiveDirectLog {

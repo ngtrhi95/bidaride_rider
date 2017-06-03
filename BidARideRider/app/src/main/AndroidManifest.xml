@@ -76,6 +76,14 @@
             android:label="Status"
             android:parentActivityName=".DirectionActivity">
         </activity>
+        <activity android:name=".LogsActivity"
+            android:label="Driver History List"
+            android:parentActivityName=".DirectionActivity">
+        </activity>
+        <activity android:name=".PopupActivity"
+            android:theme="@style/AppTheme.CustomTheme">
+        </activity>
+
 
         <activity android:name="com.facebook.FacebookActivity"
             android:configChanges=

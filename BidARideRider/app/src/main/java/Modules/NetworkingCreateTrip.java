@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
 
+import com.example.trhie.bidariderider.DirectionActivity;
 import com.example.trhie.bidariderider.ListDriver;
 
 import org.apache.http.HttpResponse;
@@ -43,8 +44,13 @@ public class NetworkingCreateTrip extends AsyncTask {
 
     @Override
     protected Object doInBackground(Object[] params) {
-        getJson((String) params[0], (TripInfo) params[1]);
+        getJson((String) params[0], (Trip) params[1]);
         return null;
+    }
+
+    @Override
+    protected void onPreExecute() {
+        super.onPreExecute();
     }
 
     @Override
@@ -53,12 +59,12 @@ public class NetworkingCreateTrip extends AsyncTask {
 
     }
 
-    private void getJson(String url, TripInfo data) {
+    private void getJson(String url, Trip data) {
         HttpClient httpClient = new DefaultHttpClient();
         HttpPost request = new HttpPost(url);
         List<NameValuePair> postParameters = new ArrayList<NameValuePair>();
 
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.context);
+        SharedPreferences prefs = DirectionActivity.SharedPreferences;
 
         String token = prefs.getString(KEY_TOKEN, "");
 
@@ -66,10 +72,11 @@ public class NetworkingCreateTrip extends AsyncTask {
         postParameters.add(new BasicNameValuePair("driverID", data.getDriverID()));
         postParameters.add(new BasicNameValuePair("tripFrom", data.getTripFrom()));
         postParameters.add(new BasicNameValuePair("tripTo", data.getTripTo()));
-        postParameters.add(new BasicNameValuePair("fromLong", data.getFromLong()));
-        postParameters.add(new BasicNameValuePair("fromLat", data.getFromLat()));
-        postParameters.add(new BasicNameValuePair("toLong", data.getToLong()));
-        postParameters.add(new BasicNameValuePair("toLat", data.getToLat()));
+        postParameters.add(new BasicNameValuePair("fromLong", String.valueOf(data.getFromLong())));
+        postParameters.add(new BasicNameValuePair("fromLat", String.valueOf(data.getFromLat())));
+        postParameters.add(new BasicNameValuePair("toLong", String.valueOf(data.getToLong())));
+        postParameters.add(new BasicNameValuePair("toLat", String.valueOf(data.getToLat())));
+        postParameters.add(new BasicNameValuePair("price", String.valueOf(data.getPrice())));
         postParameters.add(new BasicNameValuePair("token", token));
 
         BufferedReader bufferedReader = null;

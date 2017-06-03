@@ -1,15 +1,22 @@
 package com.example.trhie.bidariderider;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -59,11 +66,45 @@ public class DirectionActivity extends AppCompatActivity implements DirectionFin
     ProgressDialog progressDialog;
     UserSession session;
     String costStr;
+    int cost;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_direction);
+
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(DirectionActivity.this)
+                        .setSmallIcon(R.drawable.logo)
+                        .setContentTitle("My notification")
+                        .setPriority(Notification.PRIORITY_HIGH)
+                        .setContentText("Hello World!");
+// Creates an explicit intent for an Activity in your app
+        Intent resultIntent = new Intent(DirectionActivity.this, LogsActivity.class);
+
+// The stack builder object will contain an artificial back stack for the
+// started Activity.
+// This ensures that navigating backward from the Activity leads out of
+// your application to the Home screen.
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(DirectionActivity.this);
+// Adds the back stack for the Intent (but not the Intent itself)
+        stackBuilder.addParentStack(LogsActivity.class);
+// Adds the Intent that starts the Activity to the top of the stack
+        stackBuilder.addNextIntent(resultIntent);
+        PendingIntent resultPendingIntent =
+                stackBuilder.getPendingIntent(
+                        0,
+                        PendingIntent.FLAG_UPDATE_CURRENT
+                );
+        Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        mBuilder.setSound(alarmSound);
+        mBuilder.setContentIntent(resultPendingIntent);
+        NotificationManager mNotificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+// mId allows you to update the notification later on.
+        mNotificationManager.notify(0, mBuilder.build());
+
+        startActivity(new Intent(DirectionActivity.this, PopupActivity.class));
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         //setSupportActionBar(toolbar);
@@ -181,7 +222,7 @@ public class DirectionActivity extends AppCompatActivity implements DirectionFin
         for (Route route : routes) {
             ((TextView) findViewById(R.id.tvDirection)).setText("Distance: " + route.distance.text);
             int distance = route.distance.value;
-            int cost = distance * 3;
+            cost = distance * 3;
             costStr = Integer.toString(cost) + " VNĐ";
             ((TextView) findViewById(R.id.tvCost)).setText("Cost: " + costStr);
         }
@@ -212,7 +253,7 @@ public class DirectionActivity extends AppCompatActivity implements DirectionFin
         directionInfo.setOriginInfo(originPlace);
         directionInfo.setDesAddress(desPlace.getAddress());
         directionInfo.setDesLocation(desPlace.getLocation());
-        directionInfo.setCost(costStr);
+        directionInfo.setCost(cost);
         i.putExtra("originPlace", directionInfo);
         startActivity(i);
     }
@@ -225,6 +266,9 @@ public class DirectionActivity extends AppCompatActivity implements DirectionFin
         if (id == R.id.nav_logout) {
             session.logoutUser();
             startActivity(new Intent(DirectionActivity.this, MainActivity.class));
+        } if (id == R.id.nav_history){
+            startActivity(new Intent(DirectionActivity.this, LogsActivity.class));
+
         } else if (id == R.id.nav_aboutus) {
             startActivity(new Intent(DirectionActivity.this, AboutusActivity.class));
         } else if (id == R.id.nav_promotion){

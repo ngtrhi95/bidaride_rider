@@ -14,7 +14,7 @@ public class DirectionInfo implements Parcelable {
     private String userID;
     private String DesAddress;
     private LatLng DesLocation;
-    private String cost;
+    private int cost;
 
 
 
@@ -27,7 +27,7 @@ public class DirectionInfo implements Parcelable {
         userID = in.readString();
         DesAddress = in.readString();
         DesLocation = in.readParcelable(LatLng.class.getClassLoader());
-        cost = in.readString();
+        cost = in.readInt();
     }
 
     public static final Creator<DirectionInfo> CREATOR = new Creator<DirectionInfo>() {
@@ -74,11 +74,11 @@ public class DirectionInfo implements Parcelable {
         DesLocation = desLocation;
     }
 
-    public String getCost() {
+    public int getCost() {
         return cost;
     }
 
-    public void setCost(String cost) {
+    public void setCost(int cost) {
         this.cost = cost;
     }
 
@@ -93,6 +93,6 @@ public class DirectionInfo implements Parcelable {
         dest.writeString(userID);
         dest.writeString(DesAddress);
         dest.writeParcelable(DesLocation, flags);
-        dest.writeString(cost);
+        dest.writeInt(cost);
     }
 }

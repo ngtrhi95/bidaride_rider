@@ -19,6 +19,9 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.ConnectionFactory;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -33,16 +36,21 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeoutException;
 
 import Modules.BookingInfo;
 import Modules.DriverAdapter;
 import Modules.NetworkingCreateTrip;
 import Modules.DirectionInfo;
-import Modules.TripInfo;
+import Modules.Trip;
 
+import static com.example.trhie.bidariderider.UserSession.KEY_FNAME;
+import static com.example.trhie.bidariderider.UserSession.KEY_PHONE;
 import static com.example.trhie.bidariderider.UserSession.KEY_TOKEN;
 import static com.example.trhie.bidariderider.UserSession.PREFER_NAME;
 
@@ -52,7 +60,8 @@ import static com.example.trhie.bidariderider.UserSession.PREFER_NAME;
 
 public class ListDriver extends AppCompatActivity{
     public static android.content.SharedPreferences SharedPreferences = null;
-
+    private static String AMQP_URL = "amqp://imtqjgzz:LQWyhmVxKBMgV6ROObew36G07DUs6ZYZ@white-mynah-bird.rmq.cloudamqp.com/imtqjgzz";
+    private static String EXCHANGE_NAME_LOCATION = "notification_logs";
     ListView listItems;
     static DirectionInfo directionInfo;
     JSONArray driverObject;
@@ -87,7 +96,6 @@ public class ListDriver extends AppCompatActivity{
     }
 
     public class NetworkingAPI extends AsyncTask{
-        public static final int NETWORK_STATE_GETDRIVERS = 3;
 
         @Override
         protected void onPreExecute() {
@@ -104,7 +112,6 @@ public class ListDriver extends AppCompatActivity{
 
         @Override
         protected void onPostExecute(Object o) {
-            super.onPostExecute(o);
             setViewListDriver();
         }
 
@@ -156,7 +163,6 @@ public class ListDriver extends AppCompatActivity{
                 JSONObject jo = new JSONObject(response);
                 int status = jo.getInt("status");
                 driverObject = jo.getJSONArray("payload");
-                int status1 = jo.getInt("status");
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -216,26 +222,38 @@ public class ListDriver extends AppCompatActivity{
                 listItems.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
-                        final Driver temp = lstDriverNearYou.get(position);
+                        driver = lstDriverNearYou.get(position);
 
                         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ListDriver.this);
                         alertDialogBuilder.setTitle("Confirm");
-                        alertDialogBuilder.setMessage("Driver " + temp.driverFullname + ". Are you sure?");
+                        alertDialogBuilder.setMessage("Driver " + driver.driverFullname + ". Are you sure?");
                         alertDialogBuilder.setNegativeButton("YES",
                                 new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface arg0, int arg1) {
-                                        TripInfo tripInfo = createTripInfo(temp);
+                                        final Trip tripInfo = createTripInfo(driver);
 
-                                        NetworkingCreateTrip networking = new NetworkingCreateTrip(getApplicationContext());
-                                        networking.execute("https://appluanvan-apigateway.herokuapp.com/api/trip/create", tripInfo);
+                                        String username = SharedPreferences.getString(KEY_FNAME, "");
+                                        String userphone = SharedPreferences.getString(KEY_PHONE, "");
+                                        Gson gson = new Gson();
+                                        String json = gson.toJson(tripInfo);
 
-                                        Toast.makeText(ListDriver.this, "Booking success. Driver will contact you in a few minutes.", Toast.LENGTH_SHORT).show();
+                                        /*Toast.makeText(ListDriver.this, "Booking success. Driver will contact you in a few minutes.", Toast.LENGTH_SHORT).show();
+                                        ListDriver.this.runOnUiThread(new Runnable() {
+
+                                            @Override
+                                            public void run() {
+                                                NetworkingCreateTrip networking = new NetworkingCreateTrip(getApplicationContext());
+                                                networking.execute("https://appluanvan-apigateway.herokuapp.com/api/trip/create", tripInfo);
+                                            }
+                                        });*/
+                                        EmitLocationLogs notiTask = new EmitLocationLogs();
+                                        notiTask.execute(json.toString());
 
                                         BookingInfo bookingInfo = new BookingInfo();
-                                        bookingInfo.setDriverName(temp.driverFullname);
+                                        bookingInfo.setDriverName(driver.driverFullname);
                                         bookingInfo.setFromAddress(directionInfo.getOriginInfo().getAddress());
-                                        bookingInfo.setDriverPhone(temp.driverPhone);
+                                        bookingInfo.setDriverPhone(driver.driverPhone);
                                         bookingInfo.setToAddress(directionInfo.getDesAddress());
                                         bookingInfo.setCost(directionInfo.getCost());
                                         Intent it = new Intent(ListDriver.this, StatusActivity.class);
@@ -259,16 +277,19 @@ public class ListDriver extends AppCompatActivity{
         }
     }
 
-    private TripInfo createTripInfo(Driver temp) {
-        TripInfo tripInfo = new TripInfo();
+    private Trip createTripInfo(Driver temp) {
+        Trip tripInfo = new Trip();
         tripInfo.setUserID(directionInfo.getUserID());
         tripInfo.setDriverID(temp.driverID);
         tripInfo.setTripFrom(directionInfo.getOriginInfo().getAddress());
         tripInfo.setTripTo(directionInfo.getDesAddress());
-        tripInfo.setFromLong(Double.toString(directionInfo.getOriginInfo().getLocation().longitude));
-        tripInfo.setFromLat(Double.toString(directionInfo.getOriginInfo().getLocation().latitude));
-        tripInfo.setToLong(Double.toString(directionInfo.getDesLocation().longitude));
-        tripInfo.setToLat(Double.toString(directionInfo.getDesLocation().latitude));
+        tripInfo.setFromLong(directionInfo.getOriginInfo().getLocation().longitude);
+        tripInfo.setFromLat(directionInfo.getOriginInfo().getLocation().latitude);
+        tripInfo.setToLong(directionInfo.getDesLocation().longitude);
+        tripInfo.setToLat(directionInfo.getDesLocation().latitude);
+        tripInfo.setPrice(directionInfo.getCost());
+        tripInfo.setUsername(SharedPreferences.getString(KEY_FNAME, ""));
+        tripInfo.setUserphone(SharedPreferences.getString(KEY_PHONE, ""));
         return tripInfo;
     }
 
@@ -285,6 +306,73 @@ public class ListDriver extends AppCompatActivity{
                 });
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
+    }
+
+    private class EmitLocationLogs extends AsyncTask<String, Void, String> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+
+            ConnectionFactory factory = new ConnectionFactory();
+            try {
+                factory.setUri(AMQP_URL);
+            } catch (URISyntaxException e) {
+                e.printStackTrace();
+            } catch (NoSuchAlgorithmException e) {
+                e.printStackTrace();
+            } catch (KeyManagementException e) {
+                e.printStackTrace();
+            }
+            Connection connection = null;
+            try {
+                connection = factory.newConnection();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (TimeoutException e) {
+                e.printStackTrace();
+            }
+            Channel channel = null;
+            try {
+                channel = connection.createChannel();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                channel.exchangeDeclare(EXCHANGE_NAME_LOCATION, "direct");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                channel.basicPublish(EXCHANGE_NAME_LOCATION, driver.driverID, null, params[0].getBytes());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                channel.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (TimeoutException e) {
+                e.printStackTrace();
+            }
+            try {
+                connection.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
     }
 }
 

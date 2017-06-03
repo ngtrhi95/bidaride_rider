@@ -40,7 +40,7 @@ import dmax.dialog.SpotsDialog;
 public class SignupActivity extends AppCompatActivity {
     EditText etFullname, etEmail, etPhone, etUsername, etPassword;
     String fullname, email, phone, username, password;
-    String status;
+    int status;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -106,8 +106,7 @@ public class SignupActivity extends AppCompatActivity {
         protected void onPostExecute(Object o) {
             super.onPostExecute(o);
             progressDialog.dismiss();
-
-            if (!status.trim().equals("OK")) {
+            if (status != 200) {
                 Toast.makeText(SignupActivity.this, "Username or Email already exists!", Toast.LENGTH_SHORT).show();
             }
             else {
@@ -159,7 +158,11 @@ public class SignupActivity extends AppCompatActivity {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            status = stringBuffer.toString().trim();
+            try {
+                status = (new JSONObject(stringBuffer.toString())).getInt("status");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
     }
 }
