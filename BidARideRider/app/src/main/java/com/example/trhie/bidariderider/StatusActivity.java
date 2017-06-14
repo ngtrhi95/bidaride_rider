@@ -10,6 +10,8 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.CountDownTimer;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
@@ -17,6 +19,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.rabbitmq.client.AMQP;
@@ -32,6 +35,7 @@ import java.net.URISyntaxException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.concurrent.TimeoutException;
 
@@ -83,6 +87,28 @@ public class StatusActivity extends AppCompatActivity {
     }
 
     private class ReceiveMessage extends AsyncTask<String, Void, String> {
+        @Override
+        protected void onPreExecute() {
+            new CountDownTimer(20000, 1000) {
+                @Override
+                public void onTick(long millisUntilFinished) {
+
+                }
+
+                @Override
+                public void onFinish() {
+                    String status = (String) tvStatus.getText();
+                    //if (status.equals("Waiting")){
+                        tvStatus.setText("Cancel");
+
+                    Toast.makeText(StatusActivity.this, "Driver don't confirm your trip. Please find another driver!", Toast.LENGTH_SHORT).show();
+
+                    this.cancel();
+                    //}
+                }
+            }.start();
+        }
+
         @Override
         protected String doInBackground(String... params) {
             ConnectionFactory factory = new ConnectionFactory();

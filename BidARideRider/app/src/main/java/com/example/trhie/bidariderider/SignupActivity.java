@@ -1,14 +1,19 @@
 package com.example.trhie.bidariderider;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.telephony.TelephonyManager;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -30,6 +35,7 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import dmax.dialog.SpotsDialog;
 
@@ -58,7 +64,28 @@ public class SignupActivity extends AppCompatActivity {
         Intent it = new Intent(this, MainActivity.class);
         startActivity(it);
     }
+    Pattern letter = Pattern.compile("[a-zA-z]");
+    Pattern digit = Pattern.compile("[0-9]");
+    Pattern special = Pattern.compile ("[!@#$%&*()_+=|<>?{}\\[\\]~-]");
 
+    private  boolean validatePassword(String password) {
+        return  password.length() >= 8
+                && special.matcher(password).find()
+                && digit.matcher(password).find()
+                && letter.matcher(password).find();
+    }
+
+    private boolean isValidMobile(String phone) {
+        if (phone.length() < 10 || phone.length() > 13) {
+            return false;
+        } else {
+            return android.util.Patterns.PHONE.matcher(phone).matches();
+        }
+    }
+
+    private boolean isValidMail(String email) {
+        return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
+    }
     public void signup(View view) {
         fullname = etFullname.getText().toString();
         email = etEmail.getText().toString();
@@ -66,7 +93,7 @@ public class SignupActivity extends AppCompatActivity {
         username = etUsername.getText().toString();
         password = etPassword.getText().toString();
 
-        if (fullname.length() == 0 || email.length() == 0 || phone.length() == 0 || username.length() == 0 || password.length() == 0) {
+        if (fullname.length() == 0 || phone.length() == 0 || username.length() == 0 || password.length() == 0) {
             AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
             alertDialogBuilder.setMessage("Please fill in all information!");
             alertDialogBuilder.setPositiveButton("OK",
@@ -79,6 +106,18 @@ public class SignupActivity extends AppCompatActivity {
 
             AlertDialog alertDialog = alertDialogBuilder.create();
             alertDialog.show();
+        }
+        else if (username.length() > 20){
+            Toast.makeText(SignupActivity.this, "Username has maximum 20 characters!", Toast.LENGTH_SHORT).show();
+        }
+        else if (email.length() > 0 && isValidMail(email) == false){
+            Toast.makeText(SignupActivity.this, "Email is not valid!", Toast.LENGTH_SHORT).show();
+        }
+        else if (isValidMobile(phone) == false) {
+            Toast.makeText(SignupActivity.this, "Phone number is not valid!", Toast.LENGTH_SHORT).show();
+        }
+        else if (validatePassword(password) == false){
+            Toast.makeText(SignupActivity.this, "Password has minimum 8 characters, at least 1 letter, 1 number and 1 special character!", Toast.LENGTH_SHORT).show();
         }
         else {
             Networking n = new Networking();
@@ -107,7 +146,7 @@ public class SignupActivity extends AppCompatActivity {
             super.onPostExecute(o);
             progressDialog.dismiss();
             if (status != 200) {
-                Toast.makeText(SignupActivity.this, "Username or Email already exists!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(SignupActivity.this, "Username or Email or Phone already exists!", Toast.LENGTH_SHORT).show();
             }
             else {
                 Toast.makeText(SignupActivity.this, "Create new account success!", Toast.LENGTH_SHORT).show();

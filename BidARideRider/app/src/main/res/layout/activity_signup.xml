@@ -74,7 +74,7 @@
                 android:layout_marginLeft="22dp"
                 android:layout_marginRight="35dp"
                 android:background="#0000"
-                android:hint="Email"
+                android:hint="Email (not required)"
                 android:inputType="textEmailAddress"
                 android:padding="16dp"
                 android:textColor="#0D47A1"
