@@ -248,7 +248,7 @@ public class ListDriver extends AppCompatActivity{
                                                 networking.execute("https://appluanvan-apigateway.herokuapp.com/api/trip/create", tripInfo);
                                             }
                                         });*/
-                                        EmitLocationLogs notiTask = new EmitLocationLogs();
+                                        EmitTripLogs notiTask = new EmitTripLogs();
                                         notiTask.execute(json.toString());
 
                                         BookingInfo bookingInfo = new BookingInfo();
@@ -311,7 +311,7 @@ public class ListDriver extends AppCompatActivity{
         alertDialog.show();
     }
 
-    private class EmitLocationLogs extends AsyncTask<String, Void, String> {
+    private class EmitTripLogs extends AsyncTask<String, Void, String> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();

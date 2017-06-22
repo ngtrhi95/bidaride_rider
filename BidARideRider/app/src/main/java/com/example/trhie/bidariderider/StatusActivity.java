@@ -89,7 +89,7 @@ public class StatusActivity extends AppCompatActivity {
     private class ReceiveMessage extends AsyncTask<String, Void, String> {
         @Override
         protected void onPreExecute() {
-            new CountDownTimer(20000, 1000) {
+            new CountDownTimer(30000, 1000) {
                 @Override
                 public void onTick(long millisUntilFinished) {
 

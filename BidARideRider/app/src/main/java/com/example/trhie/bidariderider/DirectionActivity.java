@@ -190,6 +190,13 @@ public class DirectionActivity extends AppCompatActivity implements DirectionFin
             ((TextView) findViewById(R.id.tvDirection)).setText("Distance: " + route.distance.text);
             int distance = route.distance.value;
             cost = distance * 3;
+            int mod = cost % 1000;
+            if (mod <= 500){
+                cost -= mod;
+            }
+            else {
+                cost += 1000 - mod;
+            }
             costStr = Integer.toString(cost) + " VNĐ";
             ((TextView) findViewById(R.id.tvCost)).setText("Cost: " + costStr);
         }
