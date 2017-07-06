@@ -22,7 +22,8 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyAI08REC0HXkj47b2pZq-7IsHKLkPI1Z4U" />
 
-        <activity android:name=".MainActivity">
+        <activity android:name=".MainActivity"
+            android:noHistory="true">
 
         </activity>
         <activity
