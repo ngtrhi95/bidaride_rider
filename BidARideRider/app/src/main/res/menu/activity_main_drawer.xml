@@ -15,10 +15,6 @@
             android:title="Support"
             android:icon="@drawable/feedback"/>
         <item
-            android:id="@+id/nav_share"
-            android:title="Share facebook"
-            android:icon="@drawable/facebook"/>
-        <item
             android:id="@+id/nav_logout"
             android:title="Log out"
             android:icon="@drawable/logouticon"/>

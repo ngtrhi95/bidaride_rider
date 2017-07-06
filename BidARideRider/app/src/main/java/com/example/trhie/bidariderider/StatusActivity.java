@@ -57,6 +57,20 @@ public class StatusActivity extends AppCompatActivity {
     TextView tvStatus;
     BookingInfo bookingInfo;
     String userID;
+    CountDownTimer countDown = new CountDownTimer(30000, 1000) {
+        @Override
+        public void onTick(long millisUntilFinished) {
+        }
+        @Override
+        public void onFinish() {
+            String status = (String) tvStatus.getText();
+            tvStatus.setText("Cancel");
+
+            Toast.makeText(StatusActivity.this, "Driver don't confirm your trip. Please find another driver!", Toast.LENGTH_SHORT).show();
+
+            this.cancel();
+        }
+    };
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,7 +92,7 @@ public class StatusActivity extends AppCompatActivity {
         ((TextView)findViewById(R.id.tvto)).setText(bookingInfo.getToAddress());
 
         tvStatus = (TextView)findViewById(R.id.tvStatusValue);
-        ((TextView)findViewById(R.id.tvStatusCost)).setText(String.valueOf(bookingInfo.getCost()));
+        ((TextView)findViewById(R.id.tvStatusCost)).setText(String.valueOf(bookingInfo.getCost()) + " VNĐ");
         userID = SharedPreferences.getString(KEY_ID, "");
         /*ReceiveDirectLog tripTask = new ReceiveDirectLog();
         tripTask.execute(driverID);*/
@@ -89,24 +103,7 @@ public class StatusActivity extends AppCompatActivity {
     private class ReceiveMessage extends AsyncTask<String, Void, String> {
         @Override
         protected void onPreExecute() {
-            new CountDownTimer(30000, 1000) {
-                @Override
-                public void onTick(long millisUntilFinished) {
-
-                }
-
-                @Override
-                public void onFinish() {
-                    String status = (String) tvStatus.getText();
-                    //if (status.equals("Waiting")){
-                        tvStatus.setText("Cancel");
-
-                    Toast.makeText(StatusActivity.this, "Driver don't confirm your trip. Please find another driver!", Toast.LENGTH_SHORT).show();
-
-                    this.cancel();
-                    //}
-                }
-            }.start();
+           countDown.start();
         }
 
         @Override
@@ -190,6 +187,7 @@ public class StatusActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             tvStatus.setText("Accept");
+                            countDown.cancel();
                         }
                     });
                 }

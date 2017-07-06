@@ -247,8 +247,6 @@ public class DirectionActivity extends AppCompatActivity implements DirectionFin
             startActivity(new Intent(DirectionActivity.this, AboutusActivity.class));
         } else if (id == R.id.nav_promotion){
             startActivity(new Intent(DirectionActivity.this, PromotionActivity.class));
-        } else if (id == R.id.nav_share) {
-            startActivity(new Intent(DirectionActivity.this, ShareActivity.class));
         } else if (id == R.id.nav_support) {
             startActivity(new Intent(DirectionActivity.this, SupportActivity.class));
         }

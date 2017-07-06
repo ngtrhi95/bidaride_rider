@@ -28,7 +28,8 @@
         <activity
             android:name=".SigninActivity"
             android:label="Sign in"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".MainActivity"
+            android:noHistory="true">
         </activity>
         <activity
             android:name=".SignupActivity"
