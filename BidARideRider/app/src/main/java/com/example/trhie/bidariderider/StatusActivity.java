@@ -200,4 +200,10 @@ public class StatusActivity extends AppCompatActivity {
             return null;
         }
     }
+
+    @Override
+    public void onBackPressed() {
+        Intent it = new Intent(StatusActivity.this, DirectionActivity.class);
+        startActivity(it);
+    }
 }

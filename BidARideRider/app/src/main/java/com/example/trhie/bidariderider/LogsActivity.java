@@ -2,8 +2,11 @@ package com.example.trhie.bidariderider;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.ListView;
 
@@ -96,19 +99,39 @@ public class LogsActivity extends AppCompatActivity {
     private void setViewListTrip() {
 
         Gson gson = new Gson();
-        for (int i = 0; i < tripObject.length(); i++) {
-            try {
-                JsonParser parser = new JsonParser();
-                JsonElement mJson = parser.parse(tripObject.getString(i));
-                Trip trip = gson.fromJson(mJson, Trip.class);
-                listTrip.add(trip);
+        if(tripObject != null && tripObject.length() > 0) {
+            for (int i = 0; i < tripObject.length(); i++) {
+                try {
+                    JsonParser parser = new JsonParser();
+                    JsonElement mJson = parser.parse(tripObject.getString(i));
+                    Trip trip = gson.fromJson(mJson, Trip.class);
+                    listTrip.add(trip);
                 } catch (JSONException e) {
-                e.printStackTrace();
+                    e.printStackTrace();
+                }
             }
-        }
 
-        TripAdapter driverAdapter = new TripAdapter(LogsActivity.this, listTrip);
-        listItems.setAdapter(driverAdapter);
+            TripAdapter driverAdapter = new TripAdapter(LogsActivity.this, listTrip);
+            listItems.setAdapter(driverAdapter);
+        }
+        else {
+            showNoticeDialog();
+        }
+    }
+
+    private void showNoticeDialog() {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(LogsActivity.this);
+        alertDialogBuilder.setMessage("No driver history list!");
+        alertDialogBuilder.setPositiveButton("OK",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface arg0, int arg1) {
+                        Intent it = new Intent(LogsActivity.this, DirectionActivity.class);
+                        startActivity(it);
+                    }
+                });
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
     }
 
     private JSONObject getJson(String url) throws JSONException {

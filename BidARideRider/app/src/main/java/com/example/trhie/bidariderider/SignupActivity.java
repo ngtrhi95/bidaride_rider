@@ -92,8 +92,10 @@ public class SignupActivity extends AppCompatActivity {
         phone = etPhone.getText().toString();
         username = etUsername.getText().toString();
         password = etPassword.getText().toString();
+        String confirmPass = ((EditText)findViewById(R.id.confrimpswrd)).getText().toString();
 
-        if (fullname.length() == 0 || phone.length() == 0 || username.length() == 0 || password.length() == 0) {
+
+        if (fullname.length() == 0 || phone.length() == 0 || username.length() == 0 || password.length() == 0 || confirmPass.length() ==0) {
             AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
             alertDialogBuilder.setMessage("Please fill in all information!");
             alertDialogBuilder.setPositiveButton("OK",
@@ -118,6 +120,9 @@ public class SignupActivity extends AppCompatActivity {
         }
         else if (validatePassword(password) == false){
             Toast.makeText(SignupActivity.this, "Password has minimum 8 characters, at least 1 letter, 1 number and 1 special character!", Toast.LENGTH_SHORT).show();
+        }
+        else if (!password.equals(confirmPass)){
+            Toast.makeText(SignupActivity.this, "Password and Confirm Password must be same!", Toast.LENGTH_SHORT).show();
         }
         else {
             Networking n = new Networking();

@@ -7,7 +7,6 @@ import android.preference.PreferenceManager;
 import android.widget.Toast;
 
 import com.example.trhie.bidariderider.DirectionActivity;
-import com.example.trhie.bidariderider.ListDriver;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;

@@ -1,6 +1,7 @@
 package com.example.trhie.bidariderider;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -12,6 +13,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.SyncStateContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -19,19 +21,34 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SimpleItemAnimator;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.places.PlaceBuffer;
+import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
@@ -53,6 +70,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import AutoComplete.AT_Adapter;
+import AutoComplete.Constants;
+import AutoComplete.RecyclerItemClickListener;
 import Modules.DirectionFinderListener;
 import Modules.PlaceInfo;
 import Modules.Route;
@@ -61,11 +81,16 @@ import Modules.Route;
  * Created by trhie on 4/30/2017.
  */
 
-public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener, View.OnClickListener, LocationListener {
     private GoogleMap mMap;
     private EditText etAddress;
+    private ImageView clearText;
     private String address;
     private PlaceInfo lastLocation = new PlaceInfo();;
+
+    private AT_Adapter mATAdapter;
+    private RecyclerView myRecyclerView;
 
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10;
     private static final long MIN_TIME_BW_UPDATES = 1000 * 60 * 1;
@@ -75,17 +100,106 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private int idSrcmap = 0;
     private int idDesmap = 0;
     protected LocationManager locationManager;
+    private LinearLayoutManager  myLinearLayoutManager;
+    private static final int GOOGLE_API_CLIENT_ID = 0;
+    private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 3000;
+
+    protected GoogleApiClient myGoogleAppClient;
+
+    private static  final LatLngBounds myBounds = new LatLngBounds(
+            new LatLng(-0, 0), new LatLng(0, 0));
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //buildGoogleApiClient();
         setContentView(R.layout.activity_maps);
+        if (checkPlayServices()) {
+
+            buildGoogleApiClient();
+        }
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+
         etAddress = (EditText) findViewById(R.id.etAddress);
+        clearText = (ImageView) findViewById(R.id.cleartext);
+        mATAdapter = new AT_Adapter(this, R.layout.search_row, myGoogleAppClient, myBounds, null);
+        myRecyclerView = (RecyclerView)findViewById(R.id.recyclerView);
+        myLinearLayoutManager = new LinearLayoutManager(this);
+        myRecyclerView.setLayoutManager(myLinearLayoutManager);
+        myRecyclerView.setAdapter(mATAdapter);
+
+        etAddress.addTextChangedListener(new TextWatcher() {
+
+            @SuppressLint("LongLogTag")
+            public void onTextChanged(CharSequence s, int start, int before,
+                                      int count) {
+                if (s.toString().equals("")){
+                    mATAdapter.removeData();
+                }
+                else if (!s.toString().equals("") && myGoogleAppClient.isConnected()) {
+                    mATAdapter.getFilter().filter(s.toString());
+                }else if(!myGoogleAppClient.isConnected()){
+                    Toast.makeText(getApplicationContext(), Constants.API_NOT_CONNECTED,Toast.LENGTH_SHORT).show();
+                }
+
+
+            }
+
+            public void beforeTextChanged(CharSequence s, int start, int count,
+                                          int after) {
+
+            }
+
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+        myRecyclerView.addOnItemTouchListener(
+                new RecyclerItemClickListener(this, new RecyclerItemClickListener.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(View view, int position) {
+                        final AT_Adapter.PlaceAutocomplete item = mATAdapter.getItem(position);
+                        final String placeId = String.valueOf(item.placeId);
+                        Log.i("TAG", "Autocomplete item selected: " + item.description);
+                        /*
+                             Issue a request to the Places Geo Data API to retrieve a Place object with additional details about the place.
+                         */
+
+                        PendingResult<PlaceBuffer> placeResult = Places.GeoDataApi
+                                .getPlaceById(myGoogleAppClient, placeId);
+                        placeResult.setResultCallback(new ResultCallback<PlaceBuffer>() {
+                            @Override
+                            public void onResult(PlaceBuffer places) {
+                                if(places.getCount()==1){
+                                    mATAdapter.removeData();
+                                    lastLocation.setAddress(places.get(0).getAddress().toString());
+                                    lastLocation.setLocation(places.get(0).getLatLng());
+                                    etAddress.setText(places.get(0).getAddress());
+
+                                    MarkerOptions markerOptions = new MarkerOptions();
+                                    markerOptions.position(places.get(0).getLatLng());
+                                    markerOptions.title("Current Position");
+                                    mCurrLocationMarker = mMap.addMarker(markerOptions);
+
+                                    //move map camera
+                                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(places.get(0).getLatLng(),16));
+
+
+                                    //Toast.makeText(getApplicationContext(),String.valueOf(places.get(0).getLatLng()),Toast.LENGTH_SHORT).show();
+                                }else {
+                                    Toast.makeText(getApplicationContext(),Constants.SOMETHING_WENT_WRONG,Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
+                        Log.i("TAG", "Clicked: " + item.description);
+                        Log.i("TAG", "Called getPlaceById to get Place details for " + item.placeId);
+                    }
+                })
+        );
 
         Intent it = getIntent();
         idSrcmap = 0;
@@ -101,6 +215,32 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             lastLocation.setIdMap(idSrcmap);
         }
     }
+    private boolean checkPlayServices() {
+        int resultCode = GooglePlayServicesUtil
+                .isGooglePlayServicesAvailable(this);
+        if (resultCode != ConnectionResult.SUCCESS) {
+            if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
+                GooglePlayServicesUtil.getErrorDialog(resultCode, this,
+                        PLAY_SERVICES_RESOLUTION_REQUEST).show();
+            } else {
+                Toast.makeText(getApplicationContext(),
+                        "This device is not supported.", Toast.LENGTH_LONG)
+                        .show();
+                finish();
+            }
+            return false;
+        }
+        return true;
+    }
+
+    protected synchronized void buildGoogleApiClient() {
+        myGoogleAppClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(Places.GEO_DATA_API)
+                .addApi(LocationServices.API).build();
+    }
+
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -306,46 +446,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         lastLocation.setAddress(addresslines);
         lastLocation.setLocation(new LatLng(location.getLatitude(), location.getLongitude()));
         etAddress.setText(addresslines);
-    }
-    public void getLocation(View view) {
-        address = etAddress.getText().toString();
-        if (address.length() == 0) {
-            Toast.makeText(this, "Please fill in address!", Toast.LENGTH_SHORT).show();
-        }
-        else {
-            Geocoder coder = new Geocoder(this);
-            List<Address> laddress;
 
-            try {
-
-
-                // May throw an IOException
-                laddress = coder.getFromLocationName(address, 5);
-                if (laddress == null) {
-                    return;
-                }
-                Address location = laddress.get(0);
-                location.getLatitude();
-                location.getLongitude();
-
-                LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-                MarkerOptions markerOptions = new MarkerOptions();
-                markerOptions.position(latLng);
-                markerOptions.title("Current Position");
-                mCurrLocationMarker = mMap.addMarker(markerOptions);
-
-                //move map camera
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng,16));
-
-                setEtAddress(location);
-
-
-
-            } catch (IOException ex) {
-
-                ex.printStackTrace();
-            }
-        }
     }
 
     public void selectLocation(View view) {
@@ -365,5 +466,43 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         Intent i = new Intent(MapsActivity.this, DirectionActivity.class);
         i.putExtra("lastLocation", lastLocation);
         startActivity(i);
+    }
+
+    @Override
+    public void onClick(View v) {
+        if(v==clearText){
+            etAddress.setText("");
+            mATAdapter.removeData();
+        }
+    }
+
+    public void clearTextAddress(View view) {
+        etAddress.setText("");
+
+        //myRecyclerView.setAdapter(null);
+        /*RecyclerView.ItemAnimator animator = myRecyclerView.getItemAnimator();
+        if (animator instanceof SimpleItemAnimator) {
+            ((SimpleItemAnimator) animator).setSupportsChangeAnimations(false);
+        }*/
+        mATAdapter.removeData();
+    }
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (!myGoogleAppClient.isConnected() && !myGoogleAppClient.isConnecting()){
+            Log.v("Google API","Connecting");
+            myGoogleAppClient.connect();
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if(myGoogleAppClient.isConnected()){
+            Log.v("Google API","Dis-Connecting");
+            myGoogleAppClient.disconnect();
+        }
     }
 }
