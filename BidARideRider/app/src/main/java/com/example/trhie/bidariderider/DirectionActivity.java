@@ -1,25 +1,16 @@
 package com.example.trhie.bidariderider;
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.location.Location;
-import android.media.RingtoneManager;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -30,14 +21,10 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.facebook.share.model.SharePhoto;
-import com.facebook.share.model.SharePhotoContent;
-import com.facebook.share.widget.ShareButton;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
@@ -62,18 +49,15 @@ import java.net.URISyntaxException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.TimeoutException;
 
 import Modules.BookingInfo;
 import Modules.DirectionFinder;
 import Modules.DirectionFinderListener;
 import Modules.DirectionInfo;
-import Modules.DriverAdapter;
 import Modules.PlaceInfo;
 import Modules.Route;
 import Modules.Trip;
@@ -460,17 +444,38 @@ public class DirectionActivity extends AppCompatActivity implements DirectionFin
         }
         private void AutoChooseDriver() {
             List<Driver> lstDriver = getListDriverNearOrigin ();
+            if (lstDriver == null || lstDriver.size() == 0){
+                progressDialog.dismiss();
+                notiNoDriver();
+                return;
+            }
             int n = (int )(Math.random() * lstDriver.size() - 1);
             driver = lstDriver.get(n);
             if (driver != null && !driver.driverFullname.equals("")){
-                Toast.makeText(DirectionActivity.this, "No driver near you!", Toast.LENGTH_SHORT).show();
-            }
-            else {
                 SendInforToDriver(driver);
             }
+            else {
+                notiNoDriver();
+            }
+            progressDialog.dismiss();
         }
+
     }
 
+    private void notiNoDriver(){
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setMessage("No driver near you!");
+        alertDialogBuilder.setPositiveButton("OK",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface arg0, int arg1) {
+                    }
+                });
+
+
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
+    }
 
 
     private class EmitTripLogs extends AsyncTask<String, Void, String> {

@@ -119,8 +119,7 @@ public class AT_Adapter extends
             // Confirm that the query completed successfully, otherwise return null
             final Status status = autocompletePredictions.getStatus();
             if (!status.isSuccess()) {
-                Toast.makeText(mContext, "Error contacting API: " + status.toString(),
-                        Toast.LENGTH_SHORT).show();
+
                 Log.e("", "Error getting autocomplete prediction API call: " + status.toString());
                 autocompletePredictions.release();
                 return null;

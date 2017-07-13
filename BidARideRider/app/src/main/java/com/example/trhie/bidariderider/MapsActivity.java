@@ -137,13 +137,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             @SuppressLint("LongLogTag")
             public void onTextChanged(CharSequence s, int start, int before,
                                       int count) {
-                if (s.toString().equals("")){
-                    mATAdapter.removeData();
-                }
-                else if (!s.toString().equals("") && myGoogleAppClient.isConnected()) {
+                if (!s.toString().equals("") && myGoogleAppClient.isConnected()) {
                     mATAdapter.getFilter().filter(s.toString());
-                }else if(!myGoogleAppClient.isConnected()){
-                    Toast.makeText(getApplicationContext(), Constants.API_NOT_CONNECTED,Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    mATAdapter.removeData();
                 }
 
 
@@ -182,7 +180,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                                     MarkerOptions markerOptions = new MarkerOptions();
                                     markerOptions.position(places.get(0).getLatLng());
-                                    markerOptions.title("Current Position");
+                                    markerOptions.title("Your Position");
                                     mCurrLocationMarker = mMap.addMarker(markerOptions);
 
                                     //move map camera
